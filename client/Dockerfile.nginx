@@ -1,0 +1,14 @@
+# client/Dockerfile.nginx
+FROM nginx:alpine
+
+# Copia los archivos de configuración de Nginx
+COPY /nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copia los archivos estáticos construidos desde el build anterior
+COPY ./app/dist /usr/share/nginx/html
+
+# Exponer el puerto 8080
+EXPOSE 8080
+
+# Iniciar Nginx
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,52 +1,200 @@
+# version: "3.8"
+# networks:
+#     backend-for-astro-1:
+#         driver: bridge
+
+# services:
+#     mysql:
+#         image: mysql:8
+#         container_name: backend-for-astro-1-mysql
+#         tty: true
+#         ports:
+#             - "3306:3306"
+#         volumes:
+#             - "./var/libclea/mysql/:/var/lib/mysql"
+#         environment:
+#             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#             MYSQL_DATABASE: ${MYSQL_DATABASE}
+#             MYSQL_USER: ${MYSQL_USER}
+#             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#         networks:
+#             - backend-for-astro-1
+
+#     server:
+#         build: 
+#           context: .
+#         container_name: backend-for-astro-1-server
+#         ports:
+#             - "80:80"
+#         volumes:
+#             - "./var/www/html/:/var/www/html"
+#         environment:
+#             WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+#             WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+#             WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+#             WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+#         depends_on:
+#             - mysql
+#         networks:
+#             - backend-for-astro-1
+
+#     phpmyadmin:
+#         image: phpmyadmin/phpmyadmin
+#         container_name: ds-backend-for-astro-1-dbadmin
+#         ports:
+#             - "8000:80"
+#         environment:
+#             PMA_HOST: backend-for-astro-1-mysql
+#             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#         depends_on:
+#             - mysql
+#         networks:
+#             - backend-for-astro-1
+
+#     frontend-build:
+#         build:
+#           context: ./client
+#           dockerfile: Dockerfile.build
+#         container_name: backend-for-astro-1-frontend-build
+#         ports:
+#             - "4000:80"
+#         volumes:
+#             - frontend_dist:/app/dist
+#         networks:
+#             - backend-for-astro-1
+#         command: >
+#             sh -c "npm install && npm run build"
+
+#     frontend-dev:
+#         build:
+#           context: ./client
+#           dockerfile: Dockerfile.dev
+#         container_name: backend-for-astro-1-frontend-dev
+#         ports:
+#             - "4321:4321"
+#         volumes:
+#             - "./client/app:/app"
+#         environment:
+#             WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+#             WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+#             WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+#             WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+#         depends_on:
+#             - mysql
+#         networks:
+#             - backend-for-astro-1
+#     nginx:
+#         image: nginx:alpine
+#         container_name: backend-for-astro-1-nginx
+#         ports:
+#             - "8080:80"
+#         volumes:
+#             - frontend_dist:/usr/share/nginx/html
+#             - ./client/nginx.conf:/etc/nginx/conf.d/default.conf
+#         networks:
+#             - backend-for-astro-1
+#         depends_on:
+#             - frontend-build
+
+# volumes:
+#   frontend_dist:
+
+
 version: "3.8"
 networks:
-    john-wordpress-composer-npm:
+    backend-for-astro-1:
         driver: bridge
 
 services:
     mysql:
         image: mysql:8
-        container_name: john-wordpress-composer-npm-mysql
+        container_name: backend-for-astro-1-mysql
         tty: true
         ports:
             - "3306:3306"
         volumes:
             - "./var/libclea/mysql/:/var/lib/mysql"
         environment:
-            MYSQL_ROOT_PASSWORD: secret
-            MYSQL_DATABASE: wordpress
-            MYSQL_USER: john
-            MYSQL_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         networks:
-            - john-wordpress-composer-npm
+            - backend-for-astro-1
 
     server:
         build: 
           context: .
-        container_name: john-wordpress-composer-npm-server
+        container_name: backend-for-astro-1-server
         ports:
             - "80:80"
         volumes:
             - "./var/www/html/:/var/www/html"
         environment:
-            WORDPRESS_DB_USER: john
-            WORDPRESS_DB_PASSWORD: secret
-            WORDPRESS_DB_NAME: wordpress
-            WORDPRESS_DB_HOST: john-wordpress-composer-npm-mysql
+            WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+            WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+            WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+            WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
         depends_on:
             - mysql
         networks:
-            - john-wordpress-composer-npm
+            - backend-for-astro-1
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
-        container_name: ds-john-wordpress-composer-npm-dbadmin
+        container_name: ds-backend-for-astro-1-dbadmin
         ports:
             - "8000:80"
         environment:
-            PMA_HOST: john-wordpress-composer-npm-mysql
-            MYSQL_ROOT_PASSWORD: secret
+            PMA_HOST: backend-for-astro-1-mysql
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
         depends_on:
             - mysql
         networks:
-            - john-wordpress-composer-npm
+            - backend-for-astro-1
+
+    frontend-build:
+        build:
+          context: ./client
+          dockerfile: Dockerfile.build
+        container_name: backend-for-astro-1-frontend-build
+        volumes:
+            - frontend_dist:/app/dist
+        networks:
+            - backend-for-astro-1
+        command: >
+            sh -c "npm install && npm run build"
+
+    frontend-dev:
+        build:
+          context: ./client
+          dockerfile: Dockerfile.dev
+        container_name: backend-for-astro-1-frontend-dev
+        ports:
+            - "4321:4321"
+        volumes:
+            - "./client/app:/app"
+        environment:
+            WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+            WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+            WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+            WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+        depends_on:
+            - mysql
+        networks:
+            - backend-for-astro-1
+
+    nginx:
+        build:
+          context: ./client
+          dockerfile: Dockerfile.nginx
+        container_name: backend-for-astro-1-nginx
+        ports:
+            - "8080:8080"
+        depends_on:
+            - frontend-build
+        networks:
+            - backend-for-astro-1
+
+volumes:
+  frontend_dist:
